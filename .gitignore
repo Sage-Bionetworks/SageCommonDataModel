@@ -1,0 +1,71 @@
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+.eggs/
+MANIFEST
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# LinkML build artifacts
+# ---------------------------------------------------------------------------
+# Generated artifacts from `gen-*` / linkml-run-examples. Source of truth is
+# src/ — anything derived from it is regenerated, not committed.
+project/
+tmp/
+*.pyi
+
+# Generated schema serializations
+**/generated/
+*.owl
+*.owl.ttl
+*.shex
+*.shexj
+*.graphql
+*.jsonld
+*.context.jsonld
+*.schema.json
+
+# Generated docs (docs/ is committed only when publishing a built site)
+docs/_build/
+site/
+
+# ---------------------------------------------------------------------------
+# Editors / OS
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
