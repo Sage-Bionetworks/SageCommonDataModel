@@ -1,0 +1,14 @@
+# Example PROGRAM record.
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Program examples/program.yaml
+id: program.amp-ad
+name: AMP-AD
+description: >-
+  The Accelerating Medicines Partnership program for Alzheimer's Disease (AMP-AD) is a
+  precompetitive partnership among government, industry, and non-profit organizations
+  focused on discovering novel, clinically-relevant therapeutic targets and developing
+  biomarkers to help validate existing therapeutic targets for Alzheimer's disease.
+status: active
+funding_source:
+  - org.nih-nia
+source: manual curation

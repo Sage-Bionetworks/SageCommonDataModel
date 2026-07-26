@@ -1,0 +1,14 @@
+# Example PROJECT record.
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Project examples/project.yaml
+id: project.amp-als.answer-als
+name: Answer ALS
+description: >-
+  Answer ALS is a large-scale project within AMP ALS to characterize ALS through multi-omic
+  profiling of iPSC-derived motor neurons from patients. It coordinates studies across
+  multiple contributing institutions.
+program: program.amp-als
+status: active
+start_date: '2019-04-01'
+website_url: https://www.answerals.org
+source: manual curation

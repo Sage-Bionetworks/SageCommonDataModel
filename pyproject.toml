@@ -1,0 +1,27 @@
+[project]
+name = "sage-common-data-model"
+version = "0.1.0"
+description = "LinkML source schemas for the Sage Common Data Model (CDM)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+
+# Runtime dependency is only needed to build and validate the schema; the schema
+# artifacts themselves are plain YAML.
+dependencies = [
+    "linkml>=1.8",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8",
+    "pyyaml>=6",
+]
+
+[project.urls]
+Homepage = "https://github.com/Sage-Bionetworks/SageCommonDataModel"
+"CDM Modeling Principles" = "https://sagebionetworks.jira.com/wiki/spaces/CDO/pages/4788846642/CDM+Modeling+Principles"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

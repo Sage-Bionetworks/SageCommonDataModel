@@ -1,0 +1,12 @@
+# Example ORGANIZATION record.
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Organization examples/organization.yaml
+id: org.sage-bionetworks
+name: Sage Bionetworks
+ror_id: https://ror.org/03cmr0k43
+type: nonprofit
+country: US
+# acronym deliberately omitted: Sage Bionetworks has no acronym in common use, and the
+# spec says to leave it blank rather than invent one.
+source: manual curation
+date_created: '2026-07-26T00:00:00Z'

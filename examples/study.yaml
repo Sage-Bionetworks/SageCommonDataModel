@@ -1,0 +1,16 @@
+# Example STUDY record.
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Study examples/study.yaml
+id: study.amp-ad.jax-iu-pitt-5xfad
+name: JAX.IU.Pitt 5XFAD
+description: >-
+  Deep phenotyping of the 5XFAD mouse model of Alzheimer's disease, generated jointly by
+  The Jackson Laboratory, Indiana University, and the University of Pittsburgh. The study
+  produces transcriptomic, proteomic, and behavioral data across age and sex cohorts to
+  support cross-model comparison of amyloid pathology.
+program: program.amp-ad
+status: active
+primary_contact: person.a1b2c3
+contributing_organizations:
+  - org.jax
+source: manual curation
