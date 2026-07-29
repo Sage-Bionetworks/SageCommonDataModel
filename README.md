@@ -52,6 +52,16 @@ Putting them in `props.yaml` would make it import every entity schema while ever
 schema imports it — a cycle LinkML cannot resolve. Each entity file lists the reference
 slots it contributes in its header.
 
+### Example instance files
+
+Example files are named `examples/<lowercase class name><suffix>.yaml` — `program.yaml`,
+`program_nf_synodos_nf2.yaml`, and so on. The test suite globs on that convention, so a new
+instance file is validated automatically without touching the tests; a file that matches no
+class fails the suite rather than being silently skipped.
+
+`examples/portfolio.yaml` is the exception: it is a connected set of records across all five
+entities, used to check that cross-entity references resolve.
+
 ### Status
 
 Phase 1 entities implemented: ORGANIZATION, PERSON, PROGRAM, PROJECT, STUDY.
