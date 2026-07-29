@@ -1,0 +1,31 @@
+# PROGRAM instance — Gilbert Family Foundation Gene Therapy Initiative (NF Data Portal).
+# SCDM-35.
+#
+# Included as a representative active program from a third funder, and because GFF runs
+# several sibling initiatives (Vision Restoration, Brain Tumor) — a useful check that the
+# identifier scheme distinguishes them without collapsing them into one funder-level record.
+#
+# Values compiled from public Gilbert Family Foundation documentation. Reconcile against the
+# portal's Initiative records before treating this as authoritative.
+#
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Program \
+#     examples/program_nf_gff_gene_therapy.yaml
+id: program.gff-gene-therapy-initiative
+name: Gene Therapy Initiative
+description: >-
+  The Gene Therapy Initiative is the Gilbert Family Foundation's research program targeting
+  the underlying genetic abnormality in neurofibromatosis type 1 rather than its downstream
+  symptoms. It funds projects developing gene replacement, gene editing, and related
+  therapeutic approaches. Announced in December 2018, it was the Foundation's first NF1
+  research initiative and has since been joined by the Vision Restoration and Brain Tumor
+  initiatives.
+status: active
+funding_source:
+  - org.gff
+source: NF Data Portal initiative listing
+source_url: https://nf.synapse.org/Explore/Initiatives
+# `name` is the initiative's own name, not "GFF Gene Therapy Initiative". The funder is
+# carried by funding_source, and the PROGRAM spec says not to fold a funder name into the
+# program name. The funder does appear in `id` to keep it unambiguous against similarly
+# named initiatives elsewhere in the portfolio.

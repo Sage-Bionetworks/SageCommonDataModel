@@ -1,0 +1,29 @@
+# PROGRAM instance — DHART SPORE (NF Data Portal). SCDM-35.
+#
+# Included as a representative case with a government rather than foundation funder, and to
+# exercise a program whose funder is not one of the portal's three core funding
+# organizations.
+#
+# Values compiled from public NCI and DHART SPORE documentation. Reconcile against the
+# portal's Initiative records before treating this as authoritative.
+#
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Program examples/program_nf_dhart_spore.yaml
+id: program.dhart-spore
+name: DHART SPORE
+description: >-
+  The Developmental and HyperActive Ras Tumor SPORE is an NCI-sponsored Specialized Program
+  of Research Excellence working to implement targeted molecular therapies for neoplasms
+  driven by germline and somatic NF1 mutations. Unlike most SPOREs it is not organized around
+  a single cancer type, instead spanning orphan cancers that arise in different tissues
+  through a shared Ras pathway. It is co-led from UCSF and Indiana University School of
+  Medicine and involves the NCI Pediatric Oncology Branch alongside six academic
+  institutions.
+status: active
+funding_source:
+  - org.nih-nci
+source: NF Data Portal initiative listing
+source_url: https://nf.synapse.org/Explore/Initiatives
+# Grant U54 CA196519 is deliberately not recorded. PROGRAM has no grant_number slot: the
+# spec is explicit that grant-level detail belongs on a future GRANT entity, and whether a
+# separate grant_number slot is needed at all is an open question on the PROJECT page.

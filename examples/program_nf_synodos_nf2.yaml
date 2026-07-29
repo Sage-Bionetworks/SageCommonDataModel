@@ -1,0 +1,26 @@
+# PROGRAM instance — Synodos for NF2 (NF Data Portal). SCDM-35.
+#
+# Maps the NF Data Portal's "initiative" concept onto CDM PROGRAM. The portal defines an
+# initiative as a group of related grant-funded projects, which matches the CDM definition
+# of a program (spans multiple studies, supported by one or more funders). The portal's
+# "study" maps to CDM STUDY; note the portal's "project" is something else entirely — a
+# non-grant-funded output such as a hackathon result — and does NOT map to CDM PROJECT.
+#
+# Values compiled from public CTF documentation. Reconcile against the portal's Initiative
+# records before treating this as authoritative.
+#
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Program examples/program_nf_synodos_nf2.yaml
+id: program.synodos-nf2
+name: Synodos for NF2
+description: >-
+  Synodos for NF2 was a Children's Tumor Foundation consortium that brought together twelve
+  laboratories at academic and medical centers to identify and validate drug options for
+  NF2-related schwannomatosis. Participating investigators committed to sharing data,
+  results, and reagents continuously rather than at publication. The consortium ran from
+  2014 to 2018, and its full data complement was released publicly in May 2019.
+status: completed
+funding_source:
+  - org.ctf
+source: NF Data Portal initiative listing
+source_url: https://nf.synapse.org/Explore/Initiatives
