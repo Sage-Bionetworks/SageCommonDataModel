@@ -1,0 +1,15 @@
+# Draft PORTAL instance for CLASSIC.
+# SCDM-2 (PORTAL LinkML class) is not yet complete, so this file
+# has not been validated against the final schema.
+
+id: portal.classic
+name: CLASSIC Portal
+description: >-
+  The CLASSIC Portal supports the Consortium for Longitudinal Behavioral and
+  Social Science Data Integration and Coordination (CLASSIC), an NIH-funded
+  initiative that facilitates collaboration among deeply phenotyped
+  longitudinal studies of aging. The portal provides researchers with access
+  to CLASSIC study information, metadata, and data resources.
+url: https://classicportal.synapse.org/
+status: active
+maintaining_organization: org.sage-bionetworks
