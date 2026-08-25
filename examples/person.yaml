@@ -1,0 +1,22 @@
+# Example PERSON record.
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Person examples/person.yaml
+#
+# Identity data here is synthetic. This repository is public, and the PERSON spec flags
+# privacy handling for identifier values (email in particular) as an unresolved governance
+# question — so the example uses a fictional person at example.org rather than a real
+# member of staff. The ORCID iD below is ORCID's own documentation placeholder.
+id: person.a1b2c3
+display_name: Ada Example
+identifiers:
+  - source_system: jira
+    identifier_type: username
+    source_value: aexample
+  - source_system: hr_finance
+    identifier_type: email
+    source_value: ada.example@example.org
+  - source_system: orcid
+    identifier_type: orcid_id
+    source_value: 0000-0002-1825-0097
+primary_affiliation: org.sage-bionetworks
+source: manual curation

@@ -1,0 +1,98 @@
+# A connected set of CDM records, exercising every cross-entity reference in Phase 1.
+#
+# The per-entity example files each show one record in isolation. This one exists so that
+# references can actually be resolved: every id referenced below is defined below.
+# tests/test_cross_references.py asserts exactly that.
+#
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml examples/portfolio.yaml
+#
+# Identity data for the PERSON record is synthetic — see examples/person.yaml.
+
+organizations:
+  - id: org.sage-bionetworks
+    name: Sage Bionetworks
+    ror_id: https://ror.org/03cmr0k43
+    type: nonprofit
+    country: US
+  - id: org.jax
+    name: The Jackson Laboratory
+    acronym: JAX
+    ror_id: https://ror.org/021sy4w91
+    type: nonprofit
+    country: US
+  - id: org.nih-nia
+    name: National Institute on Aging
+    acronym: NIA
+    type: government
+    country: US
+    # ror_id omitted: the ORGANIZATION spec marks this one TBD pending confirmation
+    # against the ROR registry.
+
+persons:
+  - id: person.a1b2c3
+    display_name: Ada Example
+    identifiers:
+      - source_system: jira
+        identifier_type: username
+        source_value: aexample
+      - source_system: orcid
+        identifier_type: orcid_id
+        source_value: 0000-0002-1825-0097
+    primary_affiliation: org.sage-bionetworks
+
+programs:
+  - id: program.amp-ad
+    name: AMP-AD
+    description: >-
+      The Accelerating Medicines Partnership program for Alzheimer's Disease (AMP-AD) is a
+      precompetitive partnership among government, industry, and non-profit organizations
+      focused on discovering novel, clinically-relevant therapeutic targets and developing
+      biomarkers to help validate existing therapeutic targets for Alzheimer's disease.
+    status: active
+    funding_source:
+      - org.nih-nia
+  - id: program.amp-als
+    name: AMP-ALS
+    description: >-
+      The Accelerating Medicines Partnership program for ALS is a public-private partnership
+      generating and sharing multi-omic data on amyotrophic lateral sclerosis. It coordinates
+      contributions across consortium members and surfaces them through the AMP ALS Portal.
+    status: active
+
+projects:
+  - id: project.amp-als.answer-als
+    name: Answer ALS
+    description: >-
+      Answer ALS is a large-scale project within AMP ALS to characterize ALS through
+      multi-omic profiling of iPSC-derived motor neurons from patients. It coordinates
+      studies across multiple contributing institutions.
+    program: program.amp-als
+    status: active
+    start_date: '2019-04-01'
+    website_url: https://www.answerals.org
+
+studies:
+  # A study that hangs directly off a program, with no project in between — the spec is
+  # explicit that the project level is optional and should be skipped, not faked with a
+  # synthetic record.
+  - id: study.amp-ad.jax-iu-pitt-5xfad
+    name: JAX.IU.Pitt 5XFAD
+    description: >-
+      Deep phenotyping of the 5XFAD mouse model of Alzheimer's disease, generated jointly by
+      The Jackson Laboratory, Indiana University, and the University of Pittsburgh.
+    program: program.amp-ad
+    status: active
+    primary_contact: person.a1b2c3
+    contributing_organizations:
+      - org.jax
+  # A study that sits under a project, exercising the optional project level.
+  - id: study.amp-als.answer-als-ipsc
+    name: Answer ALS iPSC Cohort
+    description: >-
+      Multi-omic profiling of iPSC-derived motor neurons from the Answer ALS participant
+      cohort, covering transcriptomic, epigenomic, and proteomic assays.
+    program: program.amp-als
+    project: project.amp-als.answer-als
+    status: active
+    primary_contact: person.a1b2c3

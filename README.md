@@ -29,12 +29,56 @@ tests/       Validation tests
 docs/        Generated documentation (populated later)
 ```
 
-These directories are currently empty placeholders. Schema development is tracked on the
-[SCDM board](https://sagebionetworks.jira.com/jira/software/c/projects/SCDM/boards/2391):
-foundational base classes land in
-[SCDM-5](https://sagebionetworks.jira.com/browse/SCDM-5), followed by entity classes
-(PORTAL, PROGRAM, PERSON, ORGANIZATION, …) under
-[SCDM-1](https://sagebionetworks.jira.com/browse/SCDM-1).
+### Schema files
+
+Import `src/sage_cdm.yaml` when you want the whole model; import an individual entity file
+when you want just that class and its dependencies.
+
+| File | Contents |
+| --- | --- |
+| `src/props.yaml` | Reusable slots (`id`, `name`, `description`, `status`, `url`, dates, provenance) and the shared `LifecycleStatusEnum` |
+| `src/mixins.yaml` | `ProvenanceMixin` — where a record came from and who last touched it |
+| `src/base_entity.yaml` | `BaseEntity`, the abstract supertype every entity extends |
+| `src/organization.yaml` | `Organization` — a thin wrapper over [ROR](https://ror.org/) |
+| `src/person.yaml` | `Person`, `PersonIdentifier` |
+| `src/program.yaml` | `Program` |
+| `src/project.yaml` | `Project` |
+| `src/study.yaml` | `Study` |
+| `src/sage_cdm.yaml` | Umbrella schema; also defines the `Portfolio` container used for validating a document of many records |
+
+Slots whose range is another CDM entity (`program`, `funding_source`, `primary_contact`, …)
+are defined in the file that declares the class they point **at**, not in `props.yaml`.
+Putting them in `props.yaml` would make it import every entity schema while every entity
+schema imports it — a cycle LinkML cannot resolve. Each entity file lists the reference
+slots it contributes in its header.
+
+### Status
+
+Phase 1 entities implemented: ORGANIZATION, PERSON, PROGRAM, PROJECT, STUDY.
+
+Not yet implemented: PORTAL ([SCDM-2](https://sagebionetworks.jira.com/browse/SCDM-2)), and
+the role-assignment relationship connecting PERSON to PROGRAM / PROJECT / STUDY. Work is
+tracked on the [SCDM board](https://sagebionetworks.jira.com/jira/software/c/projects/SCDM/boards/2391)
+under [SCDM-1](https://sagebionetworks.jira.com/browse/SCDM-1).
+
+## Working with the schema
+
+```bash
+pip install -e '.[test]'
+
+pytest                                    # schema compiles, conventions hold, examples validate
+linkml-lint src/sage_cdm.yaml             # style check
+linkml-validate -s src/sage_cdm.yaml examples/portfolio.yaml
+linkml-validate -s src/sage_cdm.yaml -C Program examples/program.yaml
+gen-json-schema src/sage_cdm.yaml         # and gen-pydantic, gen-owl, gen-docs, …
+```
+
+The test suite covers three things: that every schema file compiles standalone (so a
+missing `imports:` entry can't hide behind the umbrella schema), that the CDM Modeling
+Principles conventions hold (snake_case attributes, every slot titled and described,
+identifier prefixes enforced), and that the examples validate — including negative cases
+asserting that malformed identifiers, free-text `status`, and unknown identifier source
+systems are actually rejected.
 
 ## Conventions
 
