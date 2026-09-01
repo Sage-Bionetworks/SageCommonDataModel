@@ -26,7 +26,9 @@ treated as a bug in this repository.
 src/         LinkML source files — base classes, mixins, and entity classes
 examples/    Example instance files for each entity
 tests/       Validation tests
+scripts/     Build tooling (Synapse JSON Schema generation)
 docs/        Generated documentation (populated later)
+dist/        Generated artifacts — gitignored, regenerate with `make`
 ```
 
 ### Schema files
@@ -82,6 +84,66 @@ Principles conventions hold (snake_case attributes, every slot titled and descri
 identifier prefixes enforced), and that the examples validate — including negative cases
 asserting that malformed identifiers, free-text `status`, and unknown identifier source
 systems are actually rejected.
+
+## Synapse JSON Schemas
+
+The CDM entities can also be built as JSON Schemas suitable for registering with Synapse and
+binding to Synapse entities.
+
+### Registration organization
+
+Synapse namespaces every schema under an organization, and the schema's `$id` embeds it:
+
+| | |
+| --- | --- |
+| Organization | `org.synapse.sagecdm` (Synapse id `2181`, created 2026-09-01) |
+| `$id` pattern | `https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.sagecdm-<entity>` |
+| Example | `…/registered/org.synapse.sagecdm-portal`, or `…-portal-1.0.0` when built with `--version` |
+
+The name follows the convention used by the other Sage repos that build schemas this way:
+[`org.synapse.nf`](https://github.com/nf-osi/nf-metadata-dictionary) for the NF metadata
+dictionary, and `org.synapse.ampals` in the AMP-ALS data model. Note that only
+`org.synapse.nf` actually exists in Synapse — the AMP-ALS schema carries that `$id` but the
+organization was never created, so it establishes the naming pattern rather than a working
+precedent.
+
+Registering under a different organization is a `--org` flag away, but the organization has
+to exist in Synapse first; the API rejects an unknown one with
+`Organization with name: '…' not found`.
+
+**Nothing is registered yet.** The build and its `--validate` step only ever dry-run, which
+creates nothing. Actual registration is a deliberate, separate step — it is a durable,
+versioned write to the organization above.
+
+### Building
+
+```bash
+make synapse                                    # writes dist/synapse/<Entity>.json
+python scripts/build_synapse_schemas.py --validate    # + dry-run against the Synapse API
+python scripts/build_synapse_schemas.py --version 1.0.0
+```
+
+`--validate` needs credentials, from `SYNAPSE_AUTH_TOKEN` or `~/.synapseConfig`.
+
+### Why the output is transformed
+
+Synapse implements a subset of JSON Schema, so `gen-json-schema` output cannot be registered
+as-is. Each of these was confirmed against the API, not assumed — a schema can be perfectly
+valid draft-07 and still be rejected:
+
+| Transform | Why |
+| --- | --- |
+| Dereference every `$ref`, drop `$defs` | Synapse does not resolve internal references. Enums land inline on the property that uses them. |
+| `type: [X, "null"]` → `type: X` | Synapse rejects an array-valued type: `No enum constant …Type.["string","null"]`. LinkML marks every optional slot nullable. `--keep-nullable` opts out, but the result will not register. |
+| Drop boolean `additionalProperties`, at any depth | Synapse accepts only a schema there, and fails the whole document otherwise: `JSONObject["additionalProperties"] is not a JSONObject`. |
+
+Dereferencing keeps the referring object's own keywords, so the per-slot descriptions
+sourced from the Confluence entity pages survive rather than being replaced by the enum's
+generic wording.
+
+One schema is generated per entity — anything descending from `BaseEntity`. That excludes
+`BaseEntity` itself, `ProvenanceMixin`, the `Portfolio` document container, and
+`PersonIdentifier`, which only ever appears nested inside PERSON.
 
 ## Conventions
 
