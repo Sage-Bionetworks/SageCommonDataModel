@@ -235,15 +235,22 @@ def _login():
     return syn
 
 
-def validate_with_synapse(paths: list[Path], timeout: float = 300.0) -> int:
-    """Dry-run each schema against Synapse; return the number that failed.
+def submit_to_synapse(paths: list[Path], dry_run: bool = True,
+                      timeout: float = 300.0) -> int:
+    """Submit each schema to Synapse; return the number that failed.
 
-    ``dryRun`` asks Synapse to run the same validation it would on a real
-    create, without registering anything. This is what catches the parts of the
+    With ``dry_run`` (the default) Synapse runs the same validation it would on
+    a real create but registers nothing. This is what catches the parts of the
     JSON Schema spec Synapse does not implement — a schema can be perfectly
     valid draft-07 and still be rejected here, which is the whole reason this
     build flattens.
+
+    With ``dry_run=False`` the schema is actually registered under the
+    organization named in its ``$id``. That is a durable write: the schema
+    becomes resolvable to anyone who can read the organization, and other
+    Synapse objects can bind to it.
     """
+    verb = "accepted by" if dry_run else "registered with"
     try:
         syn = _login()
     except Exception as exc:  # noqa: BLE001 - surface any auth failure verbatim
@@ -256,7 +263,8 @@ def validate_with_synapse(paths: list[Path], timeout: float = 300.0) -> int:
     failed = 0
 
     for path in paths:
-        body = json.dumps({"schema": json.loads(path.read_text()), "dryRun": True})
+        body = json.dumps({"schema": json.loads(path.read_text()),
+                           "dryRun": dry_run})
         try:
             pending[syn.restPOST(CREATE_ASYNC_START, body)["token"]] = path
         except Exception as exc:  # noqa: BLE001
@@ -288,7 +296,7 @@ def validate_with_synapse(paths: list[Path], timeout: float = 300.0) -> int:
                       file=sys.stderr)
                 failed += 1
             else:
-                print(f"  ok   {path.name} accepted by Synapse")
+                print(f"  ok   {path.name} {verb} Synapse")
         if pending:
             time.sleep(2)
 
@@ -314,6 +322,10 @@ def main() -> int:
                         help="dry-run each schema against the Synapse API; needs "
                              "SYNAPSE_AUTH_TOKEN or ~/.synapseConfig. Registers "
                              "nothing.")
+    parser.add_argument("--register", action="store_true",
+                        help="actually register the schemas with Synapse instead "
+                             "of dry-running. A durable write -- the schemas "
+                             "become resolvable and bindable.")
     parser.add_argument("--class", dest="class_name", default=None,
                         help="build a single class instead of every entity")
     args = parser.parse_args()
@@ -365,14 +377,18 @@ def main() -> int:
         return 1
     print(f"\nWrote {len(classes)} schema(s) to {_display(args.out_dir)}")
 
-    if args.validate:
+    if args.validate or args.register:
         written = [args.out_dir / f"{name}.json" for name in classes]
-        print(f"\nValidating {len(written)} schema(s) against Synapse (dry run)...")
-        rejected = validate_with_synapse(written)
+        dry_run = not args.register
+        action = "Validating" if dry_run else "Registering"
+        suffix = " (dry run)" if dry_run else ""
+        print(f"\n{action} {len(written)} schema(s) with Synapse{suffix}...")
+        rejected = submit_to_synapse(written, dry_run=dry_run)
         if rejected:
             print(f"\n{rejected} schema(s) rejected by Synapse", file=sys.stderr)
             return 1
-        print(f"\nAll {len(written)} schema(s) accepted by Synapse")
+        verb = "accepted by" if dry_run else "registered with"
+        print(f"\nAll {len(written)} schema(s) {verb} Synapse")
 
     return 0
 

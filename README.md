@@ -87,21 +87,18 @@ systems are actually rejected.
 
 ## Instance records
 
-Populated records — the actual instances of the entities described here — live in the
-Synapse project [syn76967024](https://www.synapse.org/Synapse:syn76967024). This repository
-holds the model, not the data.
+Populated records instances live in the Synapse project [syn76967024](https://www.synapse.org/Synapse:syn76967024). 
+This repository holds the model, not the data.
 
-The files under `examples/` are illustrative only: one hand-written record per entity, used
-to exercise the schema in tests. They are not a source of instance data.
+The files under `examples/` are illustrative (and may be used for tests) only.
 
 ## Synapse JSON Schemas
 
-The CDM entities can also be built as JSON Schemas suitable for registering with Synapse and
-binding to Synapse entities.
+The CDM entities can also be built as JSON Schemas suitable for registering with Synapse and binding to Synapse entities.
 
 ### Registration organization
 
-Synapse namespaces every schema under an organization, and the schema's `$id` embeds it:
+Synapse namespaces every schema under an organization, part of the schema's `$id`:
 
 | | |
 | --- | --- |
@@ -109,30 +106,27 @@ Synapse namespaces every schema under an organization, and the schema's `$id` em
 | `$id` pattern | `https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.sagecdm-<entity>` |
 | Example | `…/registered/org.synapse.sagecdm-portal`, or `…-portal-1.0.0` when built with `--version` |
 
-The name follows the convention used by other Sage repositories that build schemas this way.
-Registering under a different organization is a `--org` flag away, but the organization has
-to exist in Synapse first; the API rejects an unknown one with
-`Organization with name: '…' not found`.
-
-**Nothing is registered yet.** The build and its `--validate` step only ever dry-run, which
-creates nothing. Actual registration is a deliberate, separate step — it is a durable,
-versioned write to the organization above.
+All six entity schemas are registered, unversioned, and resolvable — for example
+`GET /schema/type/registered/org.synapse.sagecdm-portal`. Because they carry no semantic
+version, re-registering replaces the current definition in place; pass `--version` if you
+need a pinned, immutable one alongside it.
 
 ### Building
 
 ```bash
-make synapse                                    # writes dist/synapse/<Entity>.json
-python scripts/build_synapse_schemas.py --validate    # + dry-run against the Synapse API
-python scripts/build_synapse_schemas.py --version 1.0.0
+make synapse                                             # writes dist/synapse/<Entity>.json
+python scripts/build_synapse_schemas.py --validate       # + dry-run against the Synapse API
+python scripts/build_synapse_schemas.py --register       # + actually register them
+python scripts/build_synapse_schemas.py --version 1.0.0  # pin a semantic version in the $id
 ```
 
-`--validate` needs credentials, from `SYNAPSE_AUTH_TOKEN` or `~/.synapseConfig`.
+`--validate` and `--register` need credentials, from `SYNAPSE_AUTH_TOKEN` or
+`~/.synapseConfig`. `--validate` creates nothing; `--register` is a durable write, so dry-run
+first.
 
-### Why the output is transformed
+### Synapse-compatibility note
 
-Synapse implements a subset of JSON Schema, so `gen-json-schema` output cannot be registered
-as-is. Each of these was confirmed against the API, not assumed — a schema can be perfectly
-valid draft-07 and still be rejected:
+Synapse implements a subset of JSON Schema, so `gen-json-schema` output cannot be registered as-is and needs some transforms. 
 
 | Transform | Why |
 | --- | --- |
@@ -140,13 +134,7 @@ valid draft-07 and still be rejected:
 | `type: [X, "null"]` → `type: X` | Synapse rejects an array-valued type: `No enum constant …Type.["string","null"]`. LinkML marks every optional slot nullable. `--keep-nullable` opts out, but the result will not register. |
 | Drop boolean `additionalProperties`, at any depth | Synapse accepts only a schema there, and fails the whole document otherwise: `JSONObject["additionalProperties"] is not a JSONObject`. |
 
-Dereferencing keeps the referring object's own keywords, so the per-slot descriptions
-sourced from the Confluence entity pages survive rather than being replaced by the enum's
-generic wording.
-
-One schema is generated per entity — anything descending from `BaseEntity`. That excludes
-`BaseEntity` itself, `ProvenanceMixin`, the `Portfolio` document container, and
-`PersonIdentifier`, which only ever appears nested inside PERSON.
+One schema is generated per entity — anything descending from `BaseEntity`. That excludes `BaseEntity` itself, `ProvenanceMixin`, the `Portfolio` document container, and `PersonIdentifier`, which only ever appears nested inside PERSON.
 
 ## Conventions
 
