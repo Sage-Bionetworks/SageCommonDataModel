@@ -43,8 +43,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SCHEMA = REPO_ROOT / "src" / "sage_cdm.yaml"
 DEFAULT_OUT_DIR = REPO_ROOT / "dist" / "synapse"
 
-#: Synapse registers schemas under an organization-scoped id. The sibling repos
-#: use org.synapse.nf and org.synapse.ampals; this is the CDM's analogue.
+#: Synapse namespaces every schema under an organization, embedded in the $id.
+#: Override with --org; the organization must already exist in Synapse.
 DEFAULT_ORG = "org.synapse.sagecdm"
 
 REGISTRY_BASE = "https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered"

@@ -100,13 +100,7 @@ Synapse namespaces every schema under an organization, and the schema's `$id` em
 | `$id` pattern | `https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.sagecdm-<entity>` |
 | Example | `…/registered/org.synapse.sagecdm-portal`, or `…-portal-1.0.0` when built with `--version` |
 
-The name follows the convention used by the other Sage repos that build schemas this way:
-[`org.synapse.nf`](https://github.com/nf-osi/nf-metadata-dictionary) for the NF metadata
-dictionary, and `org.synapse.ampals` in the AMP-ALS data model. Note that only
-`org.synapse.nf` actually exists in Synapse — the AMP-ALS schema carries that `$id` but the
-organization was never created, so it establishes the naming pattern rather than a working
-precedent.
-
+The name follows the convention used by other Sage repositories that build schemas this way.
 Registering under a different organization is a `--org` flag away, but the organization has
 to exist in Synapse first; the API rejects an unknown one with
 `Organization with name: '…' not found`.
