@@ -41,6 +41,7 @@ when you want just that class and its dependencies.
 | `src/base_entity.yaml` | `BaseEntity`, the abstract supertype every entity extends |
 | `src/organization.yaml` | `Organization` — a thin wrapper over [ROR](https://ror.org/) |
 | `src/person.yaml` | `Person`, `PersonIdentifier` |
+| `src/portal.yaml` | `Portal` and its own `PortalStatusEnum` |
 | `src/program.yaml` | `Program` |
 | `src/project.yaml` | `Project` |
 | `src/study.yaml` | `Study` |
@@ -54,11 +55,13 @@ slots it contributes in its header.
 
 ### Status
 
-Phase 1 entities implemented: ORGANIZATION, PERSON, PROGRAM, PROJECT, STUDY.
+Phase 1 entities implemented: ORGANIZATION, PERSON, PORTAL, PROGRAM, PROJECT, STUDY.
 
-Not yet implemented: PORTAL ([SCDM-2](https://sagebionetworks.jira.com/browse/SCDM-2)), and
-the role-assignment relationship connecting PERSON to PROGRAM / PROJECT / STUDY. Work is
-tracked on the [SCDM board](https://sagebionetworks.jira.com/jira/software/c/projects/SCDM/boards/2391)
+Not yet implemented: the role-assignment relationship connecting PERSON to PROGRAM /
+PROJECT / STUDY, and the many-to-many PROGRAM-to-PORTAL relationship — whether that is a
+slot on PROGRAM or a separate PROGRAM_MAPPING table is an open modelling question awaiting
+DMG sign-off, so neither PROGRAM nor PORTAL points at the other. Work is tracked on the
+[SCDM board](https://sagebionetworks.jira.com/jira/software/c/projects/SCDM/boards/2391)
 under [SCDM-1](https://sagebionetworks.jira.com/browse/SCDM-1).
 
 ## Working with the schema

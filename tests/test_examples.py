@@ -27,6 +27,16 @@ def test_every_entity_has_an_example():
         assert (EXAMPLES / filename).is_file(), f"examples/{filename} is missing"
 
 
+#: Portal instance drafts beyond the canonical example. They are staged here ahead of the
+#: SCDM-7..15 population tickets, so they need to keep validating as the schema moves.
+EXTRA_PORTAL_EXAMPLES = sorted(p.name for p in EXAMPLES.glob("portal_*.yaml"))
+
+
+@pytest.mark.parametrize("filename", EXTRA_PORTAL_EXAMPLES)
+def test_additional_portal_example_validates(filename):
+    _assert_valid(load_yaml(EXAMPLES / filename), "Portal")
+
+
 # --------------------------------------------------------------------------
 # Negative cases — the constraints actually reject bad data
 # --------------------------------------------------------------------------
@@ -63,6 +73,18 @@ def test_malformed_ror_id_is_rejected():
 def test_full_country_name_is_rejected():
     bad = load_yaml(EXAMPLES / "organization.yaml") | {"country": "United States"}
     assert _is_invalid(bad, "Organization"), "country is an ISO 3166-1 alpha-2 code"
+
+
+def test_portal_status_from_the_shared_lifecycle_enum_is_rejected():
+    """`planned` is valid for a program but meaningless for a portal."""
+    bad = load_yaml(EXAMPLES / "portal.yaml") | {"status": "planned"}
+    assert _is_invalid(bad, "Portal"), "PORTAL takes active / in_development / retired only"
+
+
+def test_portal_without_a_url_is_rejected():
+    """url is Min 1 on PORTAL even though the shared slot is optional elsewhere."""
+    bad = {k: v for k, v in load_yaml(EXAMPLES / "portal.yaml").items() if k != "url"}
+    assert _is_invalid(bad, "Portal"), "every portal has a public address"
 
 
 def test_unknown_identifier_source_system_is_rejected():

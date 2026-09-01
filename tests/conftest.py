@@ -17,6 +17,7 @@ MAIN_SCHEMA = SRC / "sage_cdm.yaml"
 ENTITY_CLASSES = {
     "Organization": "organization.yaml",
     "Person": "person.yaml",
+    "Portal": "portal.yaml",
     "Program": "program.yaml",
     "Project": "project.yaml",
     "Study": "study.yaml",

@@ -9,9 +9,10 @@ description: >-
   Import this file (not the individual entity files) when you want the whole model. Import
   an individual entity file when you want just that class and its dependencies.
 
-  Phase 1 entities: ORGANIZATION, PERSON, PROGRAM, PROJECT, STUDY.
-  Not yet implemented: PORTAL (SCDM-2), and the role-assignment relationship connecting
-  PERSON to PROGRAM / PROJECT / STUDY.
+  Phase 1 entities: ORGANIZATION, PERSON, PORTAL, PROGRAM, PROJECT, STUDY.
+  Not yet implemented: the role-assignment relationship connecting PERSON to PROGRAM /
+  PROJECT / STUDY, and the many-to-many PROGRAM-to-PORTAL relationship (open modelling
+  question, tracked separately).
 
 license: Apache-2.0
 see_also:
@@ -31,6 +32,7 @@ imports:
   - base_entity
   - organization
   - person
+  - portal
   - program
   - project
   - study
@@ -56,6 +58,13 @@ classes:
         title: Persons
         description: PERSON records in this document.
         range: Person
+        multivalued: true
+        inlined: true
+        inlined_as_list: true
+      portals:
+        title: Portals
+        description: PORTAL records in this document.
+        range: Portal
         multivalued: true
         inlined: true
         inlined_as_list: true

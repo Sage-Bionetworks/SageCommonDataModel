@@ -41,8 +41,8 @@ enums:
       Current lifecycle state of a program, project, or study. Shared across the three
       because all three specs define an identical value set.
     comments:
-      - PORTAL uses a different value set (active / in_development / retired) and will
-        introduce its own enum under SCDM-2. Do not widen this one to accommodate it.
+      - PORTAL uses a different value set (active / in_development / retired) and has its
+        own PortalStatusEnum in portal.yaml. Do not widen this one to accommodate it.
     permissible_values:
       active:
         description: Currently operating; data contribution or generation ongoing.
@@ -125,9 +125,9 @@ slots:
       - >-
         Never a staging or preview URL, and never one requiring authentication.
       - >-
-        Declared here because SCDM-5 names it as a shared primitive; PORTAL (SCDM-2) is its
-        first consumer. PROJECT deliberately uses its own website_url slot instead, matching
-        the wording of the PROJECT spec.
+        Declared here because SCDM-5 names it as a shared primitive; PORTAL is its first
+        consumer, and narrows it to required. PROJECT deliberately uses its own website_url
+        slot instead, matching the wording of the PROJECT spec.
 
 # -----------------------------------------------------------------------------
 # Date slots

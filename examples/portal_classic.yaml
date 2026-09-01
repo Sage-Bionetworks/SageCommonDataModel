@@ -1,6 +1,9 @@
-# Draft PORTAL instance for CLASSIC.
-# SCDM-2 (PORTAL LinkML class) is not yet complete, so this file
-# has not been validated against the final schema.
+# Draft PORTAL instance for CLASSIC, staged ahead of SCDM-10.
+# Validate with:
+#   linkml-validate -s src/sage_cdm.yaml -C Portal examples/portal_classic.yaml
+#
+# launch_date is absent because it has not been confirmed; SCDM-10 owns populating the
+# real record.
 
 id: portal.classic
 name: CLASSIC Portal

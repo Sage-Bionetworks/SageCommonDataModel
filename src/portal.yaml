@@ -1,0 +1,190 @@
+id: https://sage-bionetworks.github.io/SageCommonDataModel/portal
+name: sage-cdm-portal
+title: Sage CDM PORTAL
+description: >-
+  PORTAL represents a web-based interface that surfaces one or more programs' data, tools,
+  and documentation to external users — the AD Knowledge Portal, the NF Data Portal, the
+  AMP ALS Portal, and so on. Portals are shared infrastructure: one portal can host many
+  programs, and one program may appear across several portals.
+
+  PORTAL is a standalone entity rather than a mixin on PROGRAM (2026-07-15). Modelling it
+  as a mixin would duplicate portal metadata onto every program appearing on the portal and
+  would make "which programs share this portal?" hard to ask.
+
+  This file contributes no reference slots; nothing in Phase 1 points at PORTAL. The slot
+  pointing FROM a portal AT an organization (maintaining_organization) is declared in
+  organization.yaml, alongside the class it targets, per the convention in props.yaml.
+
+license: Apache-2.0
+see_also:
+  - https://sagebionetworks.jira.com/wiki/spaces/CDO/pages/4788387865/Entity+PORTAL
+
+prefixes:
+  sagecdm: https://sage-bionetworks.github.io/SageCommonDataModel/
+  linkml: https://w3id.org/linkml/
+  dcterms: http://purl.org/dc/terms/
+  dcat: http://www.w3.org/ns/dcat#
+  schema: http://schema.org/
+  re3data: http://www.re3data.org/schema/2-2#
+default_prefix: sagecdm
+default_range: string
+
+imports:
+  - linkml:types
+  - base_entity
+  - organization
+
+enums:
+
+  PortalStatusEnum:
+    title: Portal Status
+    description: >-
+      Current lifecycle state of a portal. PORTAL carries its own value set rather than
+      sharing LifecycleStatusEnum: whether a portal is publicly reachable is a different
+      question from whether a program is scientifically underway, and the two vocabularies
+      only look similar.
+    comments:
+      - >-
+        Loosely aligns with the re3data repositoryStatus vocabulary.
+      - >-
+        Never free text. "Live", "coming soon", and "sunset" map onto active,
+        in_development, and retired respectively.
+    permissible_values:
+      active:
+        description: Publicly accessible and being maintained.
+      in_development:
+        description: Being built or in pre-launch; not yet publicly accessible.
+      retired:
+        description: Was public, but is no longer maintained or has been taken down.
+
+slots:
+
+  launch_date:
+    title: Launch Date
+    description: >-
+      The date the portal first became publicly accessible to external users — the date the
+      public URL went live. ISO 8601 (YYYY-MM-DD).
+    range: date
+    slot_uri: dcterms:issued
+    exact_mappings:
+      - re3data:startDate
+    close_mappings:
+      - schema:dateCreated
+    examples:
+      - value: '2021-11-15'
+    comments:
+      - >-
+        Not the date the grant was awarded, not the date development began, not the date of
+        the first data upload, and not the date of the first sprint.
+      - >-
+        If the exact date is not recoverable, enter the first of the month it launched and
+        add a note. If the portal is not yet public, leave this blank and set status to
+        in_development.
+      - >-
+        schema:dateCreated is recorded as a close rather than an exact mapping. The entity
+        page lists it as the Schema.org equivalent, but the CDM already binds
+        schema:dateCreated exactly to the record-level date_created provenance stamp.
+        launch_date is a business date about the portal, not a system timestamp about the
+        CDM record, so claiming both as exact would be wrong.
+
+classes:
+
+  Portal:
+    title: PORTAL
+    description: >-
+      A web-based interface that surfaces one or more programs' data, tools, and
+      documentation to external users. A portal is a top-level entity — it has no parent —
+      and references at most one maintaining organization.
+    is_a: BaseEntity
+    slots:
+      - name
+      - description
+      - url
+      - status
+      - launch_date
+      - maintaining_organization
+    slot_usage:
+      id:
+        description: >-
+          Stable machine identifier for the portal. A short lowercase string prefixed with
+          `portal.`, using hyphens for multi-word names.
+        pattern: '^portal\.[a-z0-9]+(-[a-z0-9]+)*$'
+        examples:
+          - value: portal.amp-als
+          - value: portal.ad-knowledge-portal
+        exact_mappings:
+          - schema:identifier
+          - re3data:repositoryIdentifier
+        comments:
+          - Never a URL, a UUID, a Synapse ID, or a display name with spaces or capitals.
+      name:
+        description: >-
+          Human-readable display name for the portal, as it appears on the portal itself or
+          in official documentation.
+        examples:
+          - value: AMP ALS Portal
+        exact_mappings:
+          - schema:name
+          - re3data:repositoryName
+        comments:
+          - >-
+            Never the program name — that belongs on PROGRAM. An acronym only where the
+            portal itself uses that acronym.
+      description:
+        description: >-
+          One-paragraph plain-language description of the portal's purpose and audience,
+          covering what data it surfaces and for whom. 2-4 sentences.
+        exact_mappings:
+          - schema:description
+          - re3data:description
+        comments:
+          - >-
+            Never a list of the programs it hosts — that is a relationship. Not marketing
+            copy, and not internal jargon an external user would not recognise.
+      url:
+        description: >-
+          The primary public web address at which the portal is accessible. A fully
+          qualified https URL to the portal's landing page.
+        required: true
+        examples:
+          - value: https://ampals.synapse.org
+        exact_mappings:
+          - schema:url
+          - re3data:repositoryURL
+        comments:
+          - >-
+            Required on PORTAL even though the shared url slot is optional: a portal that
+            is not reachable at an address is not a portal. A portal still being built
+            carries its eventual public URL and status in_development.
+          - >-
+            Never a Synapse project URL, never a staging or preview URL, and never one
+            requiring authentication.
+      status:
+        description: Current lifecycle state of the portal.
+        range: PortalStatusEnum
+        examples:
+          - value: active
+        close_mappings:
+          - re3data:repositoryStatus
+        comments:
+          - >-
+            Narrowed from the shared LifecycleStatusEnum to PortalStatusEnum. The slot name
+            is shared across entities but the vocabulary is not.
+      maintaining_organization:
+        description: >-
+          The organization primarily responsible for operating and maintaining this portal.
+        examples:
+          - value: org.sage-bionetworks
+    comments:
+      - >-
+        The PROGRAM-to-PORTAL relationship is deliberately absent (2026-07-15). It is
+        many-to-many, and whether it is expressed as a slot on PROGRAM or as a separate
+        PROGRAM_MAPPING table is an open modelling question awaiting DMG sign-off. Adding
+        either form now would prejudge the decision and create migration debt. Matches the
+        equivalent note on PROGRAM.
+      - >-
+        No synapse_project_id slot (2026-07-15). Portals do not always map to a single
+        Synapse project — some span several. Revisit if a genuine need emerges.
+      - >-
+        No portal_type slot (2026-07-15). Overengineering for Phase 1; add only once it
+        blocks a real query.

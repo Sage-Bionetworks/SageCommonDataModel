@@ -27,6 +27,7 @@ def _references(portfolio):
     """Yield (holder_id, slot_name, referenced_id, collection_it_must_live_in)."""
     single = {
         "persons": [("primary_affiliation", "organizations")],
+        "portals": [("maintaining_organization", "organizations")],
         "projects": [("program", "programs")],
         "studies": [
             ("program", "programs"),
@@ -65,6 +66,7 @@ def test_the_example_actually_exercises_every_reference_slot(portfolio):
     exercised = {slot for _, slot, _, _ in _references(portfolio)}
     assert exercised == {
         "primary_affiliation",
+        "maintaining_organization",
         "funding_source",
         "program",
         "project",

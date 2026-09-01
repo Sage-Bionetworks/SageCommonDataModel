@@ -12,7 +12,7 @@ description: >-
   structure, or organizational history — those live in ROR and resolve via ror_id.
 
   Reference slots contributed by this file (defined here so the import graph stays acyclic):
-  funding_source, primary_affiliation, contributing_organizations.
+  funding_source, primary_affiliation, contributing_organizations, maintaining_organization.
 
 license: Apache-2.0
 see_also:
@@ -23,6 +23,7 @@ prefixes:
   linkml: https://w3id.org/linkml/
   dcterms: http://purl.org/dc/terms/
   schema: http://schema.org/
+  re3data: http://www.re3data.org/schema/2-2#
 default_prefix: sagecdm
 default_range: string
 
@@ -149,6 +150,27 @@ slots:
       - schema:affiliation
     comments:
       - Never a free-text institution name — reuse ORGANIZATION rather than redefining it.
+
+  maintaining_organization:
+    title: Maintaining Organization
+    description: >-
+      The organization primarily responsible for operating and maintaining a portal.
+    range: Organization
+    inlined: false
+    slot_uri: dcterms:publisher
+    exact_mappings:
+      - schema:publisher
+      - re3data:institutionName
+    comments:
+      - >-
+        Not a funder, unless the funder also operates the portal. Not a person's name and
+        not a team name.
+      - >-
+        Single-valued by design. For portals under joint maintenance, enter the primary
+        operator and add a note; a full maintainer roster is a relationship, not a slot.
+      - >-
+        Optional. Where the maintainer has no ORGANIZATION record yet, leave blank and note
+        it rather than inventing one.
 
   contributing_organizations:
     title: Contributing Organizations

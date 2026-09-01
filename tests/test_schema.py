@@ -23,6 +23,7 @@ EXPECTED_SOURCE_FILES = [
     "props.yaml",
     "organization.yaml",
     "person.yaml",
+    "portal.yaml",
     "program.yaml",
     "project.yaml",
     "study.yaml",
@@ -96,6 +97,7 @@ def test_entity_id_is_an_identifier_with_a_prefix_pattern(schema_view, class_nam
     expected_prefix = {
         "Organization": "org",
         "Person": "person",
+        "Portal": "portal",
         "Program": "program",
         "Project": "project",
         "Study": "study",
@@ -171,6 +173,98 @@ def test_lifecycle_status_values_match_the_spec(schema_view):
 @pytest.mark.parametrize("class_name", ["Program", "Project", "Study"])
 def test_lifecycle_entities_share_the_status_enum(schema_view, class_name):
     assert schema_view.induced_slot("status", class_name).range == "LifecycleStatusEnum"
+
+
+def test_portal_status_values_match_the_spec(schema_view):
+    """PORTAL has its own vocabulary; it must not be the shared lifecycle one."""
+    enum = schema_view.get_enum("PortalStatusEnum")
+    assert set(enum.permissible_values) == {"active", "in_development", "retired"}
+
+
+def test_portal_does_not_reuse_the_lifecycle_status_enum(schema_view):
+    """props.yaml is explicit that LifecycleStatusEnum must not be widened for PORTAL."""
+    assert schema_view.induced_slot("status", "Portal").range == "PortalStatusEnum"
+
+
+def test_portal_has_exactly_the_seven_documented_slots(schema_view):
+    """The Entity: PORTAL cardinality table lists seven fields and no more.
+
+    Provenance reaches PORTAL through BaseEntity and is not part of the entity spec, so it
+    is excluded here rather than being allowed to mask an extra business slot.
+    """
+    slots = set(schema_view.class_slots("Portal")) - PROVENANCE_SLOTS
+    assert slots == {
+        "id",
+        "name",
+        "description",
+        "url",
+        "status",
+        "launch_date",
+        "maintaining_organization",
+    }
+
+
+@pytest.mark.parametrize(
+    "slot_name", ["id", "name", "description", "url", "status"]
+)
+def test_portal_summary_tier_slots_are_required(schema_view, slot_name):
+    """Summary tier is Min 1 / Max 1 — including url, which is optional on other entities."""
+    slot = schema_view.induced_slot(slot_name, "Portal")
+    assert slot.required, f"Portal.{slot_name} is Min 1 in the spec"
+    assert not slot.multivalued, f"Portal.{slot_name} is Max 1 in the spec"
+
+
+@pytest.mark.parametrize("slot_name", ["launch_date", "maintaining_organization"])
+def test_portal_business_tier_slots_are_optional_and_single_valued(schema_view, slot_name):
+    """Business tier is Min 0 / Max 1."""
+    slot = schema_view.induced_slot(slot_name, "Portal")
+    assert not slot.required, f"Portal.{slot_name} is Min 0 in the spec"
+    assert not slot.multivalued, f"Portal.{slot_name} is Max 1 in the spec"
+
+
+def test_portal_maintaining_organization_references_the_shared_class(schema_view):
+    """SCDM-2: reuse ORGANIZATION, do not redefine an organization structure inside PORTAL."""
+    slot = schema_view.induced_slot("maintaining_organization", "Portal")
+    assert slot.range == "Organization"
+    assert not slot.inlined, "a reference, not an inlined copy of the organization"
+
+
+def test_portal_carries_the_external_standard_mappings(schema_view):
+    """SCDM-2 asks for the DCAT / re3data / Schema.org mappings from the entity page."""
+    expected = {
+        "id": "re3data:repositoryIdentifier",
+        "name": "re3data:repositoryName",
+        "description": "re3data:description",
+        "url": "re3data:repositoryURL",
+        "launch_date": "re3data:startDate",
+        "maintaining_organization": "re3data:institutionName",
+    }
+    missing = [
+        f"Portal.{slot_name} is missing {mapping}"
+        for slot_name, mapping in expected.items()
+        if mapping not in (schema_view.induced_slot(slot_name, "Portal").exact_mappings or [])
+    ]
+    assert not missing, "\n".join(missing)
+    # status maps only loosely, so it is a close_mapping rather than an exact one.
+    status = schema_view.induced_slot("status", "Portal")
+    assert "re3data:repositoryStatus" in (status.close_mappings or [])
+
+
+def test_portal_has_no_program_relationship(schema_view):
+    """SCDM-2 out of scope: the many-to-many PROGRAM-to-PORTAL link is not decided yet."""
+    slots = set(schema_view.class_slots("Portal"))
+    forbidden = {"program", "programs", "hosted_programs", "portal"}
+    assert not (slots & forbidden), (
+        "the PROGRAM-to-PORTAL relationship awaits DMG sign-off and must not be prejudged "
+        f"here. Unexpected slots: {sorted(slots & forbidden)}"
+    )
+
+
+def test_portal_has_no_speculative_slots(schema_view):
+    """Both were explicitly rejected on the entity page (2026-07-15)."""
+    slots = set(schema_view.class_slots("Portal"))
+    forbidden = {"synapse_project_id", "portal_type"}
+    assert not (slots & forbidden), f"Unexpected slots: {sorted(slots & forbidden)}"
 
 
 def test_date_slots_use_the_date_type(schema_view):
