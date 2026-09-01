@@ -85,6 +85,15 @@ identifier prefixes enforced), and that the examples validate — including nega
 asserting that malformed identifiers, free-text `status`, and unknown identifier source
 systems are actually rejected.
 
+## Instance records
+
+Populated records — the actual instances of the entities described here — live in the
+Synapse project [syn76967024](https://www.synapse.org/Synapse:syn76967024). This repository
+holds the model, not the data.
+
+The files under `examples/` are illustrative only: one hand-written record per entity, used
+to exercise the schema in tests. They are not a source of instance data.
+
 ## Synapse JSON Schemas
 
 The CDM entities can also be built as JSON Schemas suitable for registering with Synapse and
